@@ -35,7 +35,7 @@ for i in range(10):
         degree11=generate_random_degrees(),  
         degree12=generate_random_degrees(),  
         prereq=" ",
-        lab_timings=random.randint(1,12),  
+        lab_timings=[],  
         lab_numbers=random.randint(0,4),
         lab_rooms=['301','302'],
         class_rooms=[],
@@ -63,7 +63,7 @@ def allot_room(instance,timing,weekday,room_list,sections):
     rooms_allotement=[]
     # print(sections)
     students_per_room=int(instance.course_strength/sections)
-    # print(timing)
+    print(timing)
     for room in room_list:
         # print(timing)
         if room.room_strength>students_per_room:
@@ -72,15 +72,17 @@ def allot_room(instance,timing,weekday,room_list,sections):
                 # print(timing)
                 try:
                     time_index=room.schedule[weekday].index(str(timing))
-                # print(time_index)
+                    # print(time_index,"l")
                 except  ValueError:
-                    time_index=room.schedule[weekday].index(str(timing)[1:])
-                    # print(time_index)
-
+                    try:
+                        time_index=room.schedule[weekday].index(str(timing)[1:])
+                        # print(time_index,"l")
+                    except:
+                        continue
                 # print(str(room.schedule[weekday][(time_index)]))
-                if str(room.schedule[weekday][(time_index)])==str(timing):
+                if str(room.schedule[weekday][(time_index)])==str(timing) or str(room.schedule[weekday][(time_index)])==str(timing)[1:]:
                     # print(timing)
-                    # print("slot found")
+                    # print(instance.course_name,"slot found")
                     room.schedule[weekday][time_index]=instance.course_name
                     # print(room.schedule[weekday][time_index])
                     classes_alloted=classes_alloted+1
@@ -90,13 +92,13 @@ def allot_room(instance,timing,weekday,room_list,sections):
                         break
             # except ValueError:
             #     continue
-    
+    print(classes_alloted,instance.class_numbers,instance.course_name)
     if classes_alloted==instance.class_numbers:
-        # print("CLasses alloted succesfully")
+        print("Classes alloted succesfully",instance.course_name)
         return True
     else:
         for rooms in rooms_allotement:
-            rooms.schedule['Monday'][(time_index)]=str(timing)
+            rooms.schedule[weekday][(time_index)]=str(timing)
         # instance.class_rooms=[]
         return False    
     
@@ -112,11 +114,12 @@ def allot_room_lab(instance,timing,weekday,room_list,sections):
             if lab_==lab.room_name:
                 # print("here")
                 room_list_fitered.append(lab)
-    students_per_room=int(instance.course_strength/sections)
+    # students_per_room=int(instance.course_strength/sections)
+    # print(instance.course_name,sections)
 
     for room in room_list_fitered:
         # print(room)
-        if room.room_strength>students_per_room:
+        # if room.room_strength>students_per_room:
             
             # try:
                 # print(timing)
@@ -142,13 +145,20 @@ def allot_room_lab(instance,timing,weekday,room_list,sections):
                     rooms_allotement.append(room)
                     # instance.class_rooms.append(room.room_name)
                     if classes_alloted==sections:
+                        # print("All alloted")
+                        # print(instance.course_name,"func")
+                        
                         break
             # except ValueError:
             #     continue
     
    
-        instance.lab_numbers=instance.lab_numbers-classes_alloted
-        return 
+    lab_remaining=instance.lab_numbers-classes_alloted
+    # if lab_remaining==instance.lab_numbers:
+    #     print("NO slotsfound")
+
+    # print(instance.course_name,lab_remaining,"func")
+    return lab_remaining
   
 
 
@@ -207,38 +217,41 @@ def generate_time_slots_2():
                 "courses": []
             })
             
-            current_time += timedelta(hours=1)
+            current_time += timedelta(hours=2)
         time_slots[weekday] = slots
         
     return time_slots
 time_slots=generate_time_slots()
 def allot_tut_timings(instances):
+    # print("WIP")
     
     for weekday, slots in time_slots.items():
         first_slot = slots[0]
         # print(first_slot)
         last_slot = slots[-1]
         for i in instances:
-            
+            alloted=False
+            print(i.course_name,i.tut_numbers)
             if not i.tut_timings:
-                # print("empty")
+                print(i.course_name,i.tut_timings)
                 if not compare_courses(i,first_slot["courses"]):
                     # print(allot_room(instance=i,weekday=weekday,timing=first_slot["start_time"],room_list=rooms,sections=i.tut_numbers))
-                    print(first_slot)
+                    # print(first_slot)
                     if allot_room(instance=i,weekday=weekday,timing=first_slot["start_time"],room_list=rooms,sections=i.tut_numbers): 
-                        
+                        # print(i.course_name,"LOL")
                         i.tut_timings=first_slot
                         print(i.tut_timings)
                         first_slot["courses"].append(i)
+                        alloted=True
+                    
                     # print(i.course_name," ",weekday," ",first_slot)
-                elif not  compare_courses(i,last_slot["courses"]):
-                    print(last_slot)
+                elif not  compare_courses(i,last_slot["courses"]) or alloted==False:
+                    # print(last_slot)
                     if  allot_room(instance=i,weekday=weekday,timing=last_slot["start_time"],room_list=rooms,sections=i.tut_numbers):
                         i.tut_timings=last_slot
                         last_slot["courses"].append(i)
-                    # print(i.course_name," ",weekday," ",last_slot)
-                else:
-                    continue
+                        
+            
                     
 def allot_class_timings(weekday,instances,instance_number,slots_alloted):
         prev_slots=slots_alloted
@@ -295,21 +308,30 @@ def allot_lab_timings(instances):
     
     for instance in instances:
             final_lab=instance.lab_numbers
+            # print(instance.course_name,final_lab)
             room=instance.lab_rooms
             for weekday,slots in time_slots.items():
-                slot1=slots[2]
-                slot2=slots[6]
-                slot_list.append(slot1)
+                flag=False
+                slot3=slots[2]
+                slot2=slots[3]
+                # slot_list.append(slot1)
                 slot_list.append(slot2)
+                slot_list.append(slot3)
                 if instance.lab_numbers==0:
                     
                     break
                 for i in  slot_list:
-                    allot_room_lab(instance=instance,weekday=weekday,timing=i,room_list=room,sections=instance.lab_numbers)
+                    # print(instance.course_name,instance.lab_numbers)
+                    instance.lab_numbers= allot_room_lab(instance=instance,weekday=weekday,timing=i,room_list=room,sections=instance.lab_numbers)
+                    # print(instance.course_name,instance.lab_numbers)
+                    # print(instance.lab_timings)
                     if instance.lab_numbers==0:
-                        instance.lab_numbers=final_lab
+                        flag=True
+                        
                         break
-    
+                if flag==True:
+                    instance.lab_numbers=final_lab
+                    break
 
 
 
