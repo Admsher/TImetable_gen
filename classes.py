@@ -33,6 +33,30 @@ class Course:
         self.class_rooms = class_rooms if class_rooms is not None else []
         self.tut_rooms = tut_rooms if tut_rooms is not None else []
 
+
+    def count_degree_occurrences(self):
+        self.degree_count = {}
+        for degree_list in [self.degree1, self.degree2, self.degree3, self.degree4, self.degree5,
+                            self.degree6, self.degree7, self.degree8, self.degree9, self.degree10,
+                            self.degree11, self.degree12]:
+            for degree in degree_list:
+                if degree in self.degree_count:
+                    self.degree_count[degree] += 1
+                else:
+                    self.degree_count[degree] = 1
+        return self.degree_count
+
+    def drop_least_occurrences(self):
+        if self.degree_count:
+            min_occurrences = min(self.degree_count.values())
+            for degree_attr in [self.degree1, self.degree2, self.degree3, self.degree4, self.degree5,
+                                self.degree6, self.degree7, self.degree8, self.degree9, self.degree10,
+                                self.degree11, self.degree12]:
+                for degree in degree_attr[:]:
+                    if self.degree_count[degree] == min_occurrences:
+                        degree_attr.remove(degree)
+
+
 class Room:
     def __init__(self, room_name, room_strength):
         self.room_name = room_name

@@ -49,7 +49,12 @@ room2 = Room("Room 2", 55)
 room3 = Room("Room 3", 120)
 room4 = Room("Room 4", 135)
 room5 = Room("Room 5", 100)
-rooms=[room1,room2,room3,room4,room5]
+room6 = Room("Room 6", 30)
+room7 = Room("Room 7", 55)
+room8 = Room("Room 8", 120)
+room9 = Room("Room 9", 135)
+room10 = Room("Room 10", 100)
+rooms=[room1,room2,room3,room4,room5,room6,room7,room8,room9,room10]
 
 
 lab1=Lab('301',100)
@@ -63,7 +68,7 @@ def allot_room(instance,timing,weekday,room_list,sections):
     rooms_allotement=[]
     # print(sections)
     students_per_room=int(instance.course_strength/sections)
-    print(timing)
+    # print(timing)
     for room in room_list:
         # print(timing)
         if room.room_strength>students_per_room:
@@ -93,10 +98,11 @@ def allot_room(instance,timing,weekday,room_list,sections):
             # except ValueError:
             #     continue
     print(classes_alloted,instance.class_numbers,instance.course_name)
-    if classes_alloted==instance.class_numbers:
+    if classes_alloted>=instance.class_numbers:
         print("Classes alloted succesfully",instance.course_name)
         return True
     else:
+       
         for rooms in rooms_allotement:
             rooms.schedule[weekday][(time_index)]=str(timing)
         # instance.class_rooms=[]
@@ -231,16 +237,17 @@ def allot_tut_timings(instances):
         last_slot = slots[-1]
         for i in instances:
             alloted=False
-            print(i.course_name,i.tut_numbers)
+            # print(i.course_name,i.tut_numbers)
             if not i.tut_timings:
-                print(i.course_name,i.tut_timings)
+                print("HERE")
+                # print(i.course_name,i.tut_timings)
                 if not compare_courses(i,first_slot["courses"]):
                     # print(allot_room(instance=i,weekday=weekday,timing=first_slot["start_time"],room_list=rooms,sections=i.tut_numbers))
                     # print(first_slot)
                     if allot_room(instance=i,weekday=weekday,timing=first_slot["start_time"],room_list=rooms,sections=i.tut_numbers): 
                         # print(i.course_name,"LOL")
                         i.tut_timings=first_slot
-                        print(i.tut_timings)
+                        # print(i.tut_timings)
                         first_slot["courses"].append(i)
                         alloted=True
                     
@@ -334,6 +341,42 @@ def allot_lab_timings(instances):
                     break
 
 
+checks_done=0
+def lastcheck(instances,checks_done):
+    if checks_done>=1:
+        return
+    class_empty=[]
+    tut_empty=[]
+    insatnce_overall_empty=[]
+    for i in instances:
+        if i.class_timings == [] or i.tut_timings==[]:
+            i.count_degree_occurrences()
+            i.drop_least_occurrences()
+
+        if i.class_timings==[]:
+            class_empty.append(i)
+        if class_empty!=[]:
+            allot_class_timings(weekday="Monday",instances=class_empty,instance_number=0,slots_alloted=0)
+        if i.tut_timings==[]:
+            tut_empty.append(i)
+        if tut_empty!=[]:    
+            print("HERE")
+            allot_tut_timings(instances=tut_empty)
+    for i in instances:
+        if i.class_timings == [] or i.tut_timings==[]:
+            print(i.course_name,i.tut_timings,i.class_timings)
+            insatnce_overall_empty.append(i)
+            
+    if insatnce_overall_empty!=[]:
+            # print("YES")
+            try:
+                checks_done=checks_done+1
+                lastcheck(instances=insatnce_overall_empty,checks_done=checks_done)
+            except RecursionError:
+                # print("MRP")
+                
+        
+                return
 
                
     
@@ -343,8 +386,9 @@ def allot_lab_timings(instances):
 
 
 allot_tut_timings(instances=instances)
-allot_class_timings(weekday="Monday",instances=instances,instance_number=1,slots_alloted=0)
+allot_class_timings(weekday="Monday",instances=instances,instance_number=0,slots_alloted=0)
 allot_lab_timings(instances=instances)
+lastcheck(instances=instances,checks_done=0)
 # for room in rooms:
 #     print(room.display_room_schedule())
 # for lab in lab_list:
@@ -365,3 +409,6 @@ scheduler.create_course_sheet(instances)
 
 # Save the workbook
 scheduler.save_workbook()
+
+
+
