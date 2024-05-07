@@ -84,7 +84,7 @@ def allot_room(instance,timing,weekday,room_list,sections):
                         # print(time_index,"l")
                     except:
                         continue
-                # print(str(room.schedule[weekday][(time_index)]))
+                print(room.room_name,str(room.schedule[weekday][(time_index)]))
                 if str(room.schedule[weekday][(time_index)])==str(timing) or str(room.schedule[weekday][(time_index)])==str(timing)[1:]:
                     # print(timing)
                     # print(instance.course_name,"slot found")
@@ -92,13 +92,15 @@ def allot_room(instance,timing,weekday,room_list,sections):
                     # print(room.schedule[weekday][time_index])
                     classes_alloted=classes_alloted+1
                     rooms_allotement.append(room)
+                    print(classes_alloted,sections)
                     # instance.class_rooms.append(room.room_name)
-                    if classes_alloted==sections:
+                if classes_alloted==sections:
+                        print("OGTCHA")
                         break
             # except ValueError:
             #     continue
-    print(classes_alloted,instance.class_numbers,instance.course_name)
-    if classes_alloted>=instance.class_numbers:
+    print(classes_alloted,sections,instance.course_name)
+    if classes_alloted>=sections:
         print("Classes alloted succesfully",instance.course_name)
         return True
     else:
@@ -239,7 +241,7 @@ def allot_tut_timings(instances):
             alloted=False
             # print(i.course_name,i.tut_numbers)
             if not i.tut_timings:
-                print("HERE")
+                # print("HERE")
                 # print(i.course_name,i.tut_timings)
                 if not compare_courses(i,first_slot["courses"]):
                     # print(allot_room(instance=i,weekday=weekday,timing=first_slot["start_time"],room_list=rooms,sections=i.tut_numbers))
