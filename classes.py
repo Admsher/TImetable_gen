@@ -89,8 +89,6 @@ class Room:
                 print(slot)
             print()
 
-if __name__ == "__main__":
-    room1 = Room("Room A", 50)
 
 
 

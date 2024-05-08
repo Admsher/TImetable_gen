@@ -8,58 +8,58 @@ from convert_to_excel import CourseScheduler
 ##put cdc's first in the list and then the electives to make sure cdc's get the prority while allotment
 ##there might be courses which might not get alloted any room/timing, please check manually for the same
 
-def generate_random_degrees():
-    return random.sample(range(1, 6), random.randint(0, 5))
-instances = []
-allocated_degrees = {}
+# def generate_random_degrees():
+#     return random.sample(range(1, 6), random.randint(0, 5))
+# instances = []
+# allocated_degrees = {}
 
-for i in range(10):
-    course = Course(
-        course_name=f"Course {i+1}",
-        class_frequency=3,
-        class_timings=[],  
-        class_numbers=random.randint(1,3),  
-        course_strength=50,
-        tut_timings=[],  
-        tut_numbers=random.randint(1,3), 
-        degree1=generate_random_degrees(),  
-        degree2=generate_random_degrees(),  
-        degree3=generate_random_degrees(),  
-        degree4=generate_random_degrees(),  
-        degree5=generate_random_degrees(),  
-        degree6=generate_random_degrees(),  
-        degree7=generate_random_degrees(),  
-        degree8=generate_random_degrees(),  
-        degree9=generate_random_degrees(),  
-        degree10=generate_random_degrees(),  
-        degree11=generate_random_degrees(),  
-        degree12=generate_random_degrees(),  
-        prereq=" ",
-        lab_timings=[],  
-        lab_numbers=random.randint(0,4),
-        lab_rooms=['301','302'],
-        class_rooms=[],
-        tut_rooms=[]
-    )
-    instances.append(course)
-
-
-room1 = Room("Room 1", 30)
-room2 = Room("Room 2", 55)
-room3 = Room("Room 3", 120)
-room4 = Room("Room 4", 135)
-room5 = Room("Room 5", 100)
-room6 = Room("Room 6", 30)
-room7 = Room("Room 7", 55)
-room8 = Room("Room 8", 120)
-room9 = Room("Room 9", 135)
-room10 = Room("Room 10", 100)
-rooms=[room1,room2,room3,room4,room5,room6,room7,room8,room9,room10]
+# for i in range(10):
+#     course = Course(
+#         course_name=f"Course {i+1}",
+#         class_frequency=3,
+#         class_timings=[],  
+#         class_numbers=random.randint(1,3),  
+#         course_strength=50,
+#         tut_timings=[],  
+#         tut_numbers=random.randint(1,3), 
+#         degree1=generate_random_degrees(),  
+#         degree2=generate_random_degrees(),  
+#         degree3=generate_random_degrees(),  
+#         degree4=generate_random_degrees(),  
+#         degree5=generate_random_degrees(),  
+#         degree6=generate_random_degrees(),  
+#         degree7=generate_random_degrees(),  
+#         degree8=generate_random_degrees(),  
+#         degree9=generate_random_degrees(),  
+#         degree10=generate_random_degrees(),  
+#         degree11=generate_random_degrees(),  
+#         degree12=generate_random_degrees(),  
+#         prereq=" ",
+#         lab_timings=[],  
+#         lab_numbers=random.randint(0,4),
+#         lab_rooms=['301','302'],
+#         class_rooms=[],
+#         tut_rooms=[]
+#     )
+#     instances.append(course)
 
 
-lab1=Lab('301',100)
-lab2=Lab('302',100)
-lab_list=[lab1,lab2]
+# room1 = Room("Room 1", 30)
+# room2 = Room("Room 2", 55)
+# room3 = Room("Room 3", 120)
+# room4 = Room("Room 4", 135)
+# room5 = Room("Room 5", 100)
+# room6 = Room("Room 6", 30)
+# room7 = Room("Room 7", 55)
+# room8 = Room("Room 8", 120)
+# room9 = Room("Room 9", 135)
+# room10 = Room("Room 10", 100)
+# rooms=[room1,room2,room3,room4,room5,room6,room7,room8,room9,room10]
+
+
+# lab1=Lab('301',100)
+# lab2=Lab('302',100)
+# lab_list=[lab1,lab2]
 
 
 
@@ -110,7 +110,7 @@ def allot_room(instance,timing,weekday,room_list,sections):
         # instance.class_rooms=[]
         return False    
     
-def allot_room_lab(instance,timing,weekday,room_list,sections):
+def allot_room_lab(instance,timing,weekday,room_list,sections,lab_list):
     classes_alloted=0
     rooms_allotement=[]
     room_list_fitered=[]
@@ -230,7 +230,7 @@ def generate_time_slots_2():
         
     return time_slots
 time_slots=generate_time_slots()
-def allot_tut_timings(instances):
+def allot_tut_timings(instances,rooms):
     # print("WIP")
     
     for weekday, slots in time_slots.items():
@@ -262,7 +262,7 @@ def allot_tut_timings(instances):
                         
             
                     
-def allot_class_timings(weekday,instances,instance_number,slots_alloted):
+def allot_class_timings(weekday,instances,instance_number,slots_alloted,rooms):
         prev_slots=slots_alloted
         i=instances[instance_number]
         temp_time_slots = {day: slots[:] for day, slots in time_slots.items()}
@@ -299,18 +299,18 @@ def allot_class_timings(weekday,instances,instance_number,slots_alloted):
         if slots_alloted==i.class_frequency:
             instance_number=instance_number+1
             if instance_number< len(instances):
-                allot_class_timings(weekday="Monday",instances=instances,instance_number=instance_number,slots_alloted=0)
+                allot_class_timings(weekday="Monday",instances=instances,instance_number=instance_number,slots_alloted=0,rooms=rooms)
             else:
                 return
         else:
             try:
-                allot_class_timings(weekday=weekday,instances=instances,instance_number=instance_number,slots_alloted=slots_alloted)
+                allot_class_timings(weekday=weekday,instances=instances,instance_number=instance_number,slots_alloted=slots_alloted,rooms=rooms)
             except RecursionError:
                 instance_number=instance_number+1
                 if instance_number< len(instances):
-                    allot_class_timings(weekday="Monday",instances=instances,instance_number=instance_number,slots_alloted=0)
+                    allot_class_timings(weekday="Monday",instances=instances,instance_number=instance_number,slots_alloted=0,rooms=rooms)
                 
-def allot_lab_timings(instances):
+def allot_lab_timings(instances,lab_list):
     
     time_slots=generate_time_slots_2()
     slot_list=[]
@@ -331,7 +331,7 @@ def allot_lab_timings(instances):
                     break
                 for i in  slot_list:
                     # print(instance.course_name,instance.lab_numbers)
-                    instance.lab_numbers= allot_room_lab(instance=instance,weekday=weekday,timing=i,room_list=room,sections=instance.lab_numbers)
+                    instance.lab_numbers= allot_room_lab(instance=instance,weekday=weekday,timing=i,room_list=room,sections=instance.lab_numbers,lab_list=lab_list)
                     # print(instance.course_name,instance.lab_numbers)
                     # print(instance.lab_timings)
                     if instance.lab_numbers==0:
@@ -344,7 +344,7 @@ def allot_lab_timings(instances):
 
 
 checks_done=0
-def lastcheck(instances,checks_done):
+def lastcheck(instances,checks_done,rooms):
     if checks_done>=1:
         return
     class_empty=[]
@@ -358,12 +358,12 @@ def lastcheck(instances,checks_done):
         if i.class_timings==[]:
             class_empty.append(i)
         if class_empty!=[]:
-            allot_class_timings(weekday="Monday",instances=class_empty,instance_number=0,slots_alloted=0)
+            allot_class_timings(weekday="Monday",instances=class_empty,instance_number=0,slots_alloted=0,rooms=rooms)
         if i.tut_timings==[]:
             tut_empty.append(i)
         if tut_empty!=[]:    
             print("HERE")
-            allot_tut_timings(instances=tut_empty)
+            allot_tut_timings(instances=tut_empty,rooms=rooms)
     for i in instances:
         if i.class_timings == [] or i.tut_timings==[]:
             print(i.course_name,i.tut_timings,i.class_timings)
@@ -373,7 +373,7 @@ def lastcheck(instances,checks_done):
             # print("YES")
             try:
                 checks_done=checks_done+1
-                lastcheck(instances=insatnce_overall_empty,checks_done=checks_done)
+                lastcheck(instances=insatnce_overall_empty,checks_done=checks_done,rooms=rooms)
             except RecursionError:
                 # print("MRP")
                 
@@ -383,34 +383,4 @@ def lastcheck(instances,checks_done):
                
     
                 
-
-
-
-
-allot_tut_timings(instances=instances)
-allot_class_timings(weekday="Monday",instances=instances,instance_number=0,slots_alloted=0)
-allot_lab_timings(instances=instances)
-lastcheck(instances=instances,checks_done=0)
-# for room in rooms:
-#     print(room.display_room_schedule())
-# for lab in lab_list:
-#     print(lab.display_room_schedule())
-# print(len(instances[1].class_rooms))
-scheduler = CourseScheduler()
-
-# Create sheets for rooms
-for room in rooms:
-    scheduler.create_room_sheet(room)
-
-# Create sheets for labs
-for lab in lab_list:
-    scheduler.create_lab_sheet(lab)
-
-# Create sheet for courses
-scheduler.create_course_sheet(instances)
-
-# Save the workbook
-scheduler.save_workbook()
-
-
 

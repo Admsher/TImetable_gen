@@ -3,7 +3,7 @@ import pandas as pd
 
 class CourseScheduler:
     def __init__(self):
-        self.workbook = pd.ExcelWriter("course_schedule.xlsx", engine='xlsxwriter' )
+        self.workbook = pd.ExcelWriter("output.xlsx", engine='xlsxwriter' )
 
     def create_room_sheet(self, room):
         df = pd.DataFrame.from_dict(room.schedule)
@@ -26,8 +26,9 @@ class CourseScheduler:
                 instance.degree8, instance.degree9,
                 instance.degree10,instance.degree11,instance.degree12, instance.prereq,
                 instance.lab_timings, instance.lab_numbers,
-                ','.join(instance.lab_rooms), ','.join(instance.class_rooms),
-                ','.join(instance.tut_rooms)
+                ','.join(instance.lab_rooms) if hasattr(instance.lab_rooms, '__iter__') else instance.lab_rooms,
+                  ','.join(instance.class_rooms) if hasattr(instance.class_rooms, '__iter__') else instance.class_rooms,
+                ','.join(instance.tut_rooms) if hasattr(instance.tut_rooms, '__iter__') else instance.tut_rooms
             ] for instance in instances
         ], columns=[
             "Course Name", "Class Frequency", "Class Timings", "Class Sections",
