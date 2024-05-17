@@ -19,7 +19,7 @@ def process_excel_file():
         room_instances=[]
         lab_instances=[]
         for index,row in processing_file_course.iterrows():
-            print(row)
+       
             course_name = row[0]
             class_frequency = row[1]
             class_timings = []
@@ -45,11 +45,13 @@ def process_excel_file():
             lab_rooms = row[22]
             class_rooms = row[23]
             tut_rooms = row[24]
+            prereq=row[25]
             course_instance = Course(course_name, class_frequency, class_timings, class_numbers, 
                              course_strength, tut_timings, tut_numbers, 
                              degree1, degree2, degree3, degree4, degree5,
                              degree6, degree7, degree8, degree9, degree10,degree11,degree12,
                              prereq, lab_timings, lab_numbers,class_rooms,tut_rooms,lab_rooms)
+            
     
             # Append the course instance to the list of course instances
             course_instances.append(course_instance)
