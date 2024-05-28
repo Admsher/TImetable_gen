@@ -1,0 +1,23 @@
+<!doctype html>
+<html>
+<head>
+    <title>Course Scheduler</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Course Scheduler</h1>
+    <form method="post" action="/upload" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".xls,.xlsx">
+        <button type="submit">Upload and Process</button>
+    </form>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul>
+        {% for message in messages %}
+          <li>{{ message }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+</body>
+</html>

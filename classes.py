@@ -6,7 +6,7 @@ class Course:
                  course_strength, tut_timings, tut_numbers, 
                  degree1, degree2, degree3, degree4, degree5,
                  degree6, degree7, degree8, degree9, degree10,degree11,degree12,
-                 prereq, lab_timings, lab_numbers,class_rooms,tut_rooms,lab_rooms):
+                 prereq, lab_timings, lab_numbers,class_rooms,tut_rooms,lab_rooms,faculties):
         self.course_name = course_name
         self.class_frequency = class_frequency
         self.class_timings = class_timings if class_timings is not None else []  
@@ -32,6 +32,7 @@ class Course:
         self.lab_rooms = lab_rooms if lab_rooms is not None else []
         self.class_rooms = class_rooms if class_rooms is not None else []
         self.tut_rooms = tut_rooms if tut_rooms is not None else []
+        self.faculties=faculties
 
 
     def count_degree_occurrences(self):

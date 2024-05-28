@@ -188,6 +188,23 @@ def compare_courses(course, courses_in_slot):
     
     return False  # No common degrees found, no class
 
+def compare_faculties(course, courses_in_slot):
+    # Extract degree arrays of the course being allotted
+    course_degrees = [getattr(course, f"faculties") ]
+    
+    for course_in_slot in courses_in_slot:
+        # Extract degree arrays of the course in the time slot
+        course_in_slot_degrees = [getattr(course_in_slot, f"faculties")]
+        
+        # Check if there are any common degree numbers between the two courses
+        for degree_list1 in course_degrees:
+            for degree_list2 in course_in_slot_degrees:
+                if set(degree_list1) & set(degree_list2):
+                    return True  # Common degrees found, there's a clash
+    
+    return False  # No common degrees found, no class
+
+
 
 def generate_time_slots():
     start_time = datetime.strptime("08:00:00", "%H:%M:%S")
@@ -235,6 +252,7 @@ def allot_tut_timings(instances,rooms):
     # print("WIP")
     
     for weekday, slots in time_slots.items():
+       
         first_slot = slots[0]
         # print(first_slot)
         last_slot = slots[-1]
@@ -245,21 +263,23 @@ def allot_tut_timings(instances,rooms):
                 # print("HERE")
                 # print(i.course_name,i.tut_timings)
                 if not compare_courses(i,first_slot["courses"]):
+                    if not compare_faculties(i,first_slot["courses"]) : 
                     # print(allot_room(instance=i,weekday=weekday,timing=first_slot["start_time"],room_list=rooms,sections=i.tut_numbers))
                     # print(first_slot)
-                    if allot_room(instance=i,weekday=weekday,timing=first_slot["start_time"],room_list=rooms,sections=i.tut_numbers): 
-                        # print(i.course_name,"LOL")
-                        i.tut_timings=first_slot
-                        # print(i.tut_timings)
-                        first_slot["courses"].append(i)
-                        alloted=True
+                        if allot_room(instance=i,weekday=weekday,timing=first_slot["start_time"],room_list=rooms,sections=i.tut_numbers): 
+                            # print(i.course_name,"LOL")
+                            i.tut_timings=first_slot
+                            # print(i.tut_timings)
+                            first_slot["courses"].append(i)
+                            alloted=True
                     
                     # print(i.course_name," ",weekday," ",first_slot)
                 elif not  compare_courses(i,last_slot["courses"]) or alloted==False:
+                    if not compare_faculties(i,last_slot["courses"]):   
                     # print(last_slot)
-                    if  allot_room(instance=i,weekday=weekday,timing=last_slot["start_time"],room_list=rooms,sections=i.tut_numbers):
-                        i.tut_timings=last_slot
-                        last_slot["courses"].append(i)
+                        if  allot_room(instance=i,weekday=weekday,timing=last_slot["start_time"],room_list=rooms,sections=i.tut_numbers):
+                            i.tut_timings=last_slot
+                            last_slot["courses"].append(i)
                         
 
 
@@ -278,8 +298,14 @@ def allot_class_timings(weekday,instances,instance_number,slots_alloted,rooms):
                 
             
             for slot in temp_time_slots[weekday]:
+                    current_index = temp_time_slots[weekday].index(slot)
+                    if current_index+1<len( temp_time_slots[weekday]):
+                        next_slot=temp_time_slots[weekday][current_index + 1]
+                    else:
+                         next_slot=slot
                         # print(weekday)
-                        if not compare_courses(i,slot["courses"]):
+                    if not compare_courses(i,slot["courses"]):
+                        if not compare_faculties(i,slot["courses"]) and not compare_faculties(i,next_slot["courses"]):    
                             if  allot_room(instance=i,weekday=weekday,timing=slot["start_time"],room_list=rooms,sections=i.class_numbers):
                                 i.class_timings.append([weekday,slot])
                                 slots_alloted=slots_alloted+1
@@ -293,7 +319,7 @@ def allot_class_timings(weekday,instances,instance_number,slots_alloted,rooms):
                                 else:
                                     weekday="Friday"
                                 break
-                        else:
+                    else:
                             continue
             if prev_slots-slots_alloted==0:
                         if weekday=="Monday":
