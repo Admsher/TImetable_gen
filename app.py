@@ -84,7 +84,14 @@ def process_excel_file(filepath):
     for lab in lab_instances:
         scheduler.create_lab_sheet(lab)
     scheduler.create_course_sheet(course_instances)
-    scheduler.save_workbook(filepath="output.xlsx")
+    scheduler.save_workbook()
+
+from flask import send_file
+
+@app.route('/download')
+def download_file():
+    output_filepath = os.path.join(app.root_path, 'output.xlsx')
+    return send_file(output_filepath, as_attachment=True)
 
 if __name__ == '__main__':
     app.run(debug=True)
